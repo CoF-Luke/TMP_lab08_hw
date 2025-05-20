@@ -1,0 +1,28 @@
+name: CI
+
+on:
+ push:
+  branches: [main]
+ pull_request:
+  branches: [main]
+
+jobs:
+ build:
+
+  runs-on: ubuntu-latest
+
+  steps:
+  - name: Checkout repository
+    uses: actions/checkout@v3
+
+  - name: Configure CMake
+    shell: bash
+    run: cmake -H. -B _build
+
+  - name: Build project
+    shell: bash
+    run: cmake --build _build
+
+  - name: Run hello_world_application
+    shell: bash
+    run: _build/hello_world_application/hello_world_application
