@@ -1,29 +1,176 @@
-name: CI
+name: Build Package Release
 
 on:
- push:
-  branches: [main]
- pull_request:
-  branches: [main]
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
- build:
+  linux-build:
+    runs-on: ubuntu-latest
 
-  runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  steps:
-  - name: Checkout repository
-    uses: actions/checkout@v3
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake rpm
 
-  - name: Configure CMake
-    shell: bash
-    run: cmake -H. -B _build
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
-  - name: Build project
-    shell: bash
-    run: cmake --build _build
+      - name: Build App
+        run: cmake --build build --config Release
 
-  - name: Run hello_world_application
-    shell: bash
-    run: _build/hello_world_application/hello_world_application
-    
+      - name: Create linux-packages
+        run: |
+          cd build
+          cpack -G DEB -C Release
+          cpack -G RPM -C Release
+          mv *.deb solver.deb
+          mv *.rpm solver.rpm
+
+      - name: Create source archive
+        run: |
+          git archive --format=zip -o source.zip HEAD
+          git archive --format=tar.gz -o source.tar.gz HEAD
+
+      - name: Upload linux-packages artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            build/solver.deb
+            build/solver.rpm
+
+      - name: Upload source-code artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-code
+          path: |
+            source.zip
+            source.tar.gz
+
+
+  windows-build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.27'
+
+      - name: Debug WiX
+        run: |
+          Get-Command candle.exe -ErrorAction SilentlyContinue
+          candle -?
+
+      - name: Add WiX Toolset to PATH
+        run: |
+          $wixPath = "C:\Program Files (x86)\WiX Toolset v3.14\bin"
+          if (Test-Path $wixPath) {
+            echo "WiX found at $wixPath, adding to PATH..."
+            echo "$wixPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          } else {
+            Write-Error "WiX Toolset not found at $wixPath!"
+            exit 1
+          }
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build App
+        run: cmake --build build --config Release
+
+      - name: Create windows-packages
+        run: |
+          cd build
+          cpack -G WIX
+          mv *.msi solver.msi
+
+      - name: Upload windows-packages artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-packages
+          path: |
+            build/solver.msi
+
+
+  macos-build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build App
+        run: cmake --build build --config Release
+
+      - name: Create macos-packages
+        run: |
+          cd build
+          cpack -G DragNDrop
+          mv *.dmg solver.dmg
+
+      - name: Upload macos-packages artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-packages
+          path: |
+            build/solver.dmg
+
+
+
+
+  release:
+    needs: [linux-build, windows-build, macos-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download linux-packages artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-packages
+          path: linux-packages
+
+      - name: Download windows-packages artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-packages
+          path: windows-packages
+
+      - name: Download macos-packages artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-packages
+          path: macos-packages
+
+      - name: Download Source Code
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+          path: source-code
+
+      - name: Upload GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          files: |
+            linux-packages/*.deb
+            linux-packages/*.rpm
+            windows-packages/*.msi
+            macos-packages/*.dmg
+            source-code/source.zip
+            source-code/source.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
