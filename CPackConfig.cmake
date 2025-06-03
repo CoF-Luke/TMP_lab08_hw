@@ -7,7 +7,7 @@ include(InstallRequiredSystemLibraries)
 
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 SET(CPACK_GENERATORS "TGZ;ZIP;DEB;RPM;WIX;DragNDrop")
-SET(CPACK_COMPONENTS_ALL "formatter_lib;formatter_ex_lib;solver_lib;hello_world_application;solver_application")
+#SET(CPACK_COMPONENTS_ALL "formatter_lib;formatter_ex_lib;solver_lib;hello_world_application;solver_application")
 
 #  Source package
 SET(CPACK_SOURCE_GENERATOR "TGZ")
@@ -22,9 +22,8 @@ SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.31), libstdc++6 (>= 11), libm6, libgcc-s1")
 
 # RPM package
-IF (CPACK_GENERATOR STREQUAL "RPM")
-    SET(CPACK_RPM_PACKAGE_REQUIRES "libc6 >= 2.31, libstdc++ >= 11, libm, libgcc")
-ENDIF()
+SET(CPACK_RPM_PACKAGE_REQUIRES "libc6 >= 2.31, libstdc++ >= 11, libm, libgcc")
+
 
 # WIX package
 SET(CPACK_WIX_PRODUCT_GUID "4d0c47f0-a7d1-47f7-86a3-c2a3e8126d0d")
@@ -33,6 +32,4 @@ SET(CPACK_WIX_CMAKE_PACKAGE_REGISTRY TRUE)
 SET(CPACK_WIX_ARCHITECTURE "x64")
 
 # DragNDrop package
-IF (CPACK_GENERATOR STREQUAL "DragNDrop")
-    SET(CPACK_DMG_FORMAT UDZO)
-ENDIF()
+SET(CPACK_DMG_FORMAT UDZO)
