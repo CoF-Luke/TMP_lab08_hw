@@ -11,9 +11,9 @@ VOLUME /app/build
 # RUN cmake -H. -B build -DCMAKE_BUILD_TYPE=Release
 # RUN cmake --build build
 
-ENV LOG_PATH /home/logs/log.txt
+ENV LOG_PATH /app/logs/log.txt
 
-VOLUME /home/logs
+RUN mkdir -p /app/logs
 
 
 ENTRYPOINT ["/bin/bash", "-c"]
