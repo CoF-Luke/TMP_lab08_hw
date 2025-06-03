@@ -17,7 +17,6 @@ jobs:
       - name: Build and get log
         run: docker build -t logger .
         
-
       - name: Run Docker Container and Get Log
         run: |
           docker run \
