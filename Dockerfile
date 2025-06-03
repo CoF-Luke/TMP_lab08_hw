@@ -13,7 +13,7 @@ VOLUME /app/build
 
 ENV LOG_PATH /home/logs/log.txt
 
-RUN mkdir -p /app/logs
+VOLUME /home/logs
 
 
 ENTRYPOINT ["/bin/bash", "-c"]
