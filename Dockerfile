@@ -17,4 +17,4 @@ RUN mkdir -p /app/logs
 
 
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["cmake -H/app/src -B. build -DCMAKE_BUILD_TYPE=Release && cmake --build build && cp $LOG_PATH /artifacts/log.txt"]
+CMD ["cmake -H/app/src -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build && cp $LOG_PATH /artifacts/log.txt"]
