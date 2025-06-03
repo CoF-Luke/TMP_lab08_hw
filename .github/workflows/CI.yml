@@ -95,6 +95,12 @@ jobs:
           cpack -G WIX
           mv *.msi solver.msi
 
+      - name: Output WiX Log
+        if: always()
+        run: |
+          Get-Content build/_CPack_Packages/win64/WIX/wix.log
+        shell: powershell
+        
       - name: Upload windows-packages artifacts
         uses: actions/upload-artifact@v4
         with:
