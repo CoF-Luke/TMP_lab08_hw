@@ -21,6 +21,11 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
+        
+      - name: Output Image Name
+        run: |
+            echo "Image name: "
+            echo ${{ steps.docker_build.outputs.image }}
 
       - name: Run Docker Container and Get Log
         run: |
