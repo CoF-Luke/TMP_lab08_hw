@@ -20,7 +20,9 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          #push: false
+          push: false
+          build-args: |
+            BUILD_VERSION: ${{ github.run_number }}
         
       - name: Output Image Name
         run: |
