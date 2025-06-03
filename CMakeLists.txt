@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.28.3)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(lab06hw VERSION 0.1.5 LANGUAGES CXX)
+project(lab06hw VERSION 0.1.6 LANGUAGES CXX)
 
 add_subdirectory(formatter_lib)
 add_subdirectory(formatter_ex_lib)
