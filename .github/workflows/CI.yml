@@ -1,0 +1,36 @@
+name: Create Docker, Build and Get Log
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and get log
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+
+      - name: Run Docker Container and Get Log
+        run: |
+          docker run \
+            -v ${{ github.workspace }}:/app/src:ro \
+            -v ${{ github.workspace }}/build:/app/build \
+            -v ${{ github.workspace }}/artifacts:/artifacts \
+            ${{ steps.docker_build.outputs.image }}
+
+      - name: Upload Log Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-file
+          path: artifacts/log.txt
