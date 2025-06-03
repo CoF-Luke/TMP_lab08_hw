@@ -5,7 +5,7 @@ SET(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 
 include(InstallRequiredSystemLibraries)
 
-set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt)
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 SET(CPACK_GENERATORS "TGZ;ZIP;DEB;RPM;WIX;DragNDrop")
 SET(CPACK_COMPONENTS_ALL "formatter_lib;formatter_ex_lib;solver_lib;hello_world_application;solver_application")
 
